@@ -1,8 +1,8 @@
 function webdoc(varargin)
     %  WEBDOC Reference page in Help browser.
     %  
-    %     WEBDOC opens the Help browser, if it is not already running, and 
-    %     otherwise brings the Help browser to the top.
+    %     WEBDOC opens Firefox and displays help directly from the MathWorks
+    %     website, rather than the built in MATLAB help browser
     %   
     %     WEBDOC FUNCTIONNAME displays the reference page for FUNCTIONNAME in
     %     the Help browser. FUNCTIONNAME can be a function or block in an
@@ -226,7 +226,7 @@ function success = displayDocPage(possibleTopics)
         end
 
         for ii = 1:length(thisTopic)   
-            url = [docPageURL toolbox '/ref/' strjoin(thisTopic(ii:end), '.') '.html']
+            url = [docPageURL toolbox '/ref/' strjoin(thisTopic(ii:end), '.') '.html'];
 
             % Check if URL exists
             [status cmdout] = unix(['wget -S --spider --server-response ' lower(url) ' 2>&1 | grep "HTTP/"']);  
@@ -239,7 +239,7 @@ function success = displayDocPage(possibleTopics)
         end
         
         % As a last resort, check if this topic is a class
-        if length(thisTopic) > 0 && exist(thisTopic{end}, 'class')
+        if ~isempty(thisTopic) && exist(thisTopic{end}, 'class')
           
             % Build up URL for a matlab class
             url = [docPageURL toolbox '/ref/' thisTopic{end}, '-class' '.html'];
