@@ -1,0 +1,24 @@
+
+webdoc
+
+A version of the MATLAB 'doc' command that opens the function reference in an external web browser, instead of MATLAB's built in help browser. Useful for installations where HTML rendering does not work correctly, such as the Windows Subsystem for Linux (WSL)
+
+webdoc was tested and found to work for all of the examples of the 'doc' command in MATLAB
+
+webdoc was tested using MATLAB R2018b for Linux, but should work on any macOS or Linux MATLAB installation. It will not work on MATLAB for Windows. It was tested using Firefox Quantum 66.0.2 on Ubuntu 18.04, but should work with any web browser that can be launched from the command line. By using the -new-tab flag, each new call to doc opens a new tab in the existing Firefox browser window. The command line call and arguments can be changed by editing the global variable browserCommand in the config section at the top of the m-file.
+
+webdoc will pull help pages for the latest version of MATLAB from the MathWorks website, not necessarily for the specific version you are running. The MathWorks URLs are subject to change, and an update to their website may break this function. The URLs for each of the three search locations (productPage, docPage, and docSearch) can be modified by editing the global variables in the config section at the top of the m-file.
+
+The function is a modified version of MATLAB's built in doc command, and leverages MATLAB's input parsing to determine candidates for the command name. Thus, it should be able to search function reference pages for functions, classes, blocks, or methods.
+
+The logic flow of MATLAB's doc command is preserved: First, it will first search for product pages (e.g. landing page for a MATLAB toolbox), then MathWorks references pages for that particular toolbox, then check if the command is a class (which has a special URL format of <topic>-class.html), then convert and display the  help text at the top of custom m-file as HTML. If none of these are found, then it will forward the search string to the online help search.
+
+webdoc will determine if a custom M-file exists on the path using the exist command [exist(topic, 'file')], and then convert the m-file text comments into HTML for display in a web browser using help2hmtl. Thus, builtin MATLAB functions will not be displayed locally. The generated html pages are saved in a path defined by tempdir, in a folder called matlab_<username>. On Linux systems, tempdir is set to /tmp/ by default, so the documentation would be saved in /tmp/matlab_<username>/<topic>.html
+
+Filename sanitization is done to try to avoid use of an invalid Linux filename, but there are no guarantees that valid filenames will be generated. Also, most of the links generated with help2html will not work.
+
+
+A number of tricks are employed to make this work:
+	- Matlab functions and classes sometimes have case, but the URLs on the help site are always lowercase
+	- Classes do have help pages, but are appended with -class.html in the URL
+	
