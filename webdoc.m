@@ -135,9 +135,12 @@ function webdoc(varargin)
             topic = topic(1:end-1);
         end
 
-        if showProductPage(topic)
-            return;
-        end
+        % Call showProductPage after displayDocPage, since most help
+        % will come from docPage, this will save us the time of an HTTPS
+        % request to check if the product page exists
+        % if showProductPage(topic)
+        %     return;
+        % end
         
         [possibleTopics, isPrimitive] = helpUtils.resolveDocTopic(topic, isVariable);
         
@@ -150,7 +153,7 @@ function webdoc(varargin)
         possibleTopics.isElement = false;
     end
     
-    if ~displayDocPage(possibleTopics) && ~showHelpwin(topic)
+    if ~displayDocPage(possibleTopics) && ~showProductPage(topic) && ~showHelpwin(topic)
         docsearch(topic);
     end
 end
@@ -214,7 +217,11 @@ function success = displayDocPage(possibleTopics)
         thisTopic = strsplit(topic.topic, '/');
         
         % Determine which product/toolbox
-        if strcmp(thisTopic{1}, '(matlab)')
+        if length(thisTopic) < 2
+          % No toolbox specified, default to matlab
+          toolbox = 'matlab';
+          
+        elseif strcmp(thisTopic{1}, '(matlab)')
           % Search URL is MATLAB product reference
           toolbox = 'matlab';
           thisTopic(1) = []; % Remove the first element of the cell array
